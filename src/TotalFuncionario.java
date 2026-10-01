@@ -10,7 +10,7 @@ public class TotalFuncionario {
     }
 
     public void adicionar(BigDecimal valor) {
-        total = total.add(valor);
+        total = valor;
     }
 
     public Funcionario getFuncionario() {

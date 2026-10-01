@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 
-public class MainPessoa8 {
+public class Main {
 
     public static void main(String[] args) {
         Scanner entrada = new Scanner(System.in);
