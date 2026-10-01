@@ -12,7 +12,7 @@ public class CadastroFuncionarios {
 
         for (Funcionario funcionario : funcionarios) {
 
-            if (funcionario.getMatricula() != matricula) {
+            if (funcionario.getMatricula() == matricula) {
                 return true;
             }
         }
@@ -27,7 +27,14 @@ public class CadastroFuncionarios {
 
         if (matriculaExiste(matricula)) {
             System.out.println("Erro: matrícula já cadastrada.");
+            return false;
+        }
 
+        if (matricula <= 0 || nome == null || nome.trim().isEmpty()
+                || departamento == null || departamento.getNome() == null
+                || departamento.getNome().trim().isEmpty()) {
+            System.out.println("Erro: informe matrícula positiva, nome e departamento válidos.");
+            return false;
         }
 
         Funcionario funcionario =
@@ -38,6 +45,15 @@ public class CadastroFuncionarios {
         System.out.println("Funcionário cadastrado com sucesso.");
 
         return true;
+    }
+
+    public Funcionario buscarPorMatricula(int matricula) {
+        for (Funcionario funcionario : funcionarios) {
+            if (funcionario.getMatricula() == matricula) {
+                return funcionario;
+            }
+        }
+        return null;
     }
 
     public void listarFuncionarios() {
