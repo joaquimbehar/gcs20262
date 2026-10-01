@@ -14,6 +14,15 @@ public class Funcionario {
         this.nome = nome.trim();
         this.iniciais = iniciais.trim();
         this.departamento = departamento.trim();
+
+    private int matricula;
+    private String nome;
+    private Departamento departamento;
+
+    public Funcionario(int matricula, String nome, Departamento departamento) {
+        this.matricula = matricula;
+        this.nome = nome;
+        this.departamento = departamento;
     }
 
     public int getMatricula() {
@@ -32,4 +41,12 @@ public class Funcionario {
         return departamento;
     }
 
+    public Departamento getDepartamento() {
+        return departamento;
+    }
+
+    @Override
+    public String toString() {
+        return matricula + " - " + nome + " - " + departamento.getNome();
+    }
 }
