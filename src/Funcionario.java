@@ -1,52 +1,49 @@
+import java.util.Locale;
+
 public class Funcionario {
     private final int matricula;
     private final String nome;
     private final String iniciais;
-    private final String departamento;
+    private final Departamento departamento;
 
+    public Funcionario(int matricula, String nome, Departamento departamento) {
+        this(matricula, nome, gerarIniciais(nome), departamento);
+    }
+
+    // Mantém o construtor utilizado pelos exemplos de consultas.
     public Funcionario(int matricula, String nome, String iniciais, String departamento) {
+        this(matricula, nome, iniciais, new Departamento(departamento));
+    }
+
+    private Funcionario(int matricula, String nome, String iniciais, Departamento departamento) {
         if (matricula <= 0 || nome == null || nome.trim().isEmpty()
                 || iniciais == null || iniciais.trim().isEmpty()
-                || departamento == null || departamento.trim().isEmpty()) {
-            throw new IllegalArgumentException("Dados do funcionario invalidos.");
+                || departamento == null || departamento.getNome() == null
+                || departamento.getNome().trim().isEmpty()) {
+            throw new IllegalArgumentException("Dados do funcionário inválidos.");
         }
         this.matricula = matricula;
         this.nome = nome.trim();
         this.iniciais = iniciais.trim();
-        this.departamento = departamento.trim();
-
-    private int matricula;
-    private String nome;
-    private Departamento departamento;
-
-    public Funcionario(int matricula, String nome, Departamento departamento) {
-        this.matricula = matricula;
-        this.nome = nome;
         this.departamento = departamento;
     }
 
-    public int getMatricula() {
-        return matricula;
+    private static String gerarIniciais(String nome) {
+        if (nome == null || nome.trim().isEmpty()) { return ""; }
+        String iniciais = "";
+        for (String parte : nome.trim().split("\\s+")) {
+            iniciais += parte.substring(0, 1);
+        }
+        return iniciais.toUpperCase(Locale.ROOT);
     }
 
-    public String getNome() {
-        return nome;
-    }
-
-    public String getIniciais() {
-        return iniciais;
-    }
-
-    public String getDepartamento() {
-        return departamento;
-    }
-
-    public Departamento getDepartamento() {
-        return departamento;
-    }
+    public int getMatricula() { return matricula; }
+    public String getNome() { return nome; }
+    public String getIniciais() { return iniciais; }
+    public Departamento getDepartamento() { return departamento; }
 
     @Override
     public String toString() {
-        return matricula + " - " + nome + " - " + departamento.getNome();
+        return matricula + " - " + nome + " (" + iniciais + ") - " + departamento.getNome();
     }
 }

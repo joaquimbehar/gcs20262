@@ -35,8 +35,8 @@ public class CadastroDepartamentos {
 
     public Departamento buscarPorIndice(int indice) {
 
-        if (indice >= 0 && indice < departamentos.size()) {
-            return departamentos.get(indice);
+        if (indice >= 1 && indice <= departamentos.size()) {
+            return departamentos.get(indice - 1);
         }
 
         return null;
