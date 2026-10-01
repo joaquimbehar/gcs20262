@@ -95,7 +95,7 @@ public class ConsultasCustos {
                 RegistroCusto atual = encontrados.get(j);
                 RegistroCusto escolhido = encontrados.get(maisRecente);
 
-                if (atual.getData().isAfter(escolhido.getData())) {
+                if (atual.getData().isBefore(escolhido.getData())) {
                     maisRecente = j;
                 } else if (atual.getData().equals(escolhido.getData())) {
                     if (atual.getCodigo() > escolhido.getCodigo()) {
