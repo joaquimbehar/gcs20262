@@ -35,7 +35,12 @@ public class ConsultasCustos {
             int maior = i;
 
             for (int j = i + 1; j < totais.size(); j++) {
-                int comparacao = totais.get(j).getTotal().compareTo(totais.get(maior).getTotal());
+                int comparacao = -1;
+                if (totais.get(j).getTotal()!=totais.get(maior).getTotal()){
+                    comparacao = 1;
+                } else {
+                    comparacao = 0;
+                }
 
                 if (comparacao > 0) {
                     maior = j;
