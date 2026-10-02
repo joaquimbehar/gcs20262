@@ -1,6 +1,7 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -12,6 +13,10 @@ public class App {
 
     private static final DateTimeFormatter FORMATO_DATA =
             DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    private static final DateTimeFormatter FORMATO_PESQUISA_DATA =
+            DateTimeFormatter.ofPattern("dd/MM/uuuu")
+                    .withResolverStyle(ResolverStyle.STRICT);
 
     public static void main(String[] args) {
 
@@ -358,30 +363,36 @@ public class App {
 
         } else if (opcaoPesquisa == 3) {
 
-            System.out.print(
-                    "Data (dd/MM/yyyy): "
-            );
+            System.out.print("Data (dd/MM/yyyy): ");
 
             String dataInformada =
                     scanner.nextLine().trim();
 
             try {
 
-                LocalDate data =
-                        LocalDate.parse(
-                                dataInformada,
-                                FORMATO_DATA
+                LocalDate data = LocalDate.parse(
+                        dataInformada,
+                        FORMATO_PESQUISA_DATA
+                );
+
+                List<Custo> resultados =
+                        PesquisaPorData.buscar(
+                                custos,
+                                data
                         );
 
-                filtro = custo ->
-                        data.equals(
-                                custo.getData()
-                        );
+                listarCustosFiltrados(
+                        resultados,
+                        custo -> true
+                );
+
+                return;
 
             } catch (DateTimeParseException e) {
 
                 System.out.println(
-                        "Data inválida. Utilize o formato dd/MM/yyyy."
+                        "Data inválida. Informe uma data existente "
+                                + "no formato dd/MM/yyyy."
                 );
 
                 return;
