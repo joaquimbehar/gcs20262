@@ -4,7 +4,7 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -15,31 +15,8 @@ public class PainelGastos {
     private static final int LIMITE_RANKING = 3;
     private static final Locale LOCALE_BRASIL = Locale.forLanguageTag("pt-BR");
 
-    public static class PosicaoRanking {
-
-        private final Funcionario funcionario;
-        private BigDecimal total;
-
-        public PosicaoRanking(Funcionario funcionario) {
-            this.funcionario = funcionario;
-            this.total = BigDecimal.ZERO;
-        }
-
-        public Funcionario getFuncionario() {
-            return funcionario;
-        }
-
-        public BigDecimal getTotal() {
-            return total;
-        }
-
-        private void adicionarValor(BigDecimal valor) {
-            total = total.add(valor);
-        }
-    }
-
-    public List<PosicaoRanking> ranking(List<Custo> custos) {
-        Map<Integer, PosicaoRanking> rankingPorMatricula = new HashMap<>();
+    public List<TotalFuncionario> ranking(List<Custo> custos) {
+        Map<Integer, TotalFuncionario> rankingPorMatricula = new HashMap<>();
 
         for (Custo custo : custos) {
             Funcionario funcionario = custo.getFuncionario();
@@ -48,22 +25,17 @@ public class PainelGastos {
                 continue;
             }
 
-            PosicaoRanking posicao = rankingPorMatricula.computeIfAbsent(
+            TotalFuncionario tf = rankingPorMatricula.computeIfAbsent(
                     funcionario.getMatricula(),
-                    matricula -> new PosicaoRanking(funcionario)
+                    matricula -> new TotalFuncionario(funcionario)
             );
 
-            posicao.adicionarValor(custo.getValor());
+            tf.adicionar(custo.getValor());
         }
 
-        List<PosicaoRanking> ranking = new ArrayList<>(rankingPorMatricula.values());
-
-        ranking.sort(
-                Comparator.comparing(PosicaoRanking::getTotal)
-                        .reversed()
-                        .thenComparingInt(posicao ->
-                                posicao.getFuncionario().getMatricula())
-        );
+        List<TotalFuncionario> ranking = new ArrayList<>(rankingPorMatricula.values());
+        
+        Collections.sort(ranking);
 
         int limite = Math.min(LIMITE_RANKING, ranking.size());
 
@@ -192,7 +164,7 @@ public class PainelGastos {
                 "Top 3 funcionarios - todos os custos cadastrados:"
         );
 
-        List<PosicaoRanking> lideres = ranking(custos);
+        List<TotalFuncionario> lideres = ranking(custos);
 
         if (lideres.isEmpty()) {
             saida.println(
@@ -202,8 +174,8 @@ public class PainelGastos {
         }
 
         for (int i = 0; i < lideres.size(); i++) {
-            PosicaoRanking posicao = lideres.get(i);
-            Funcionario funcionario = posicao.getFuncionario();
+            TotalFuncionario tf = lideres.get(i);
+            Funcionario funcionario = tf.getFuncionario();
 
             saida.println(
                     (i + 1)
@@ -212,7 +184,7 @@ public class PainelGastos {
                             + " ["
                             + funcionario.getMatricula()
                             + "]: "
-                            + moeda.format(posicao.getTotal())
+                            + moeda.format(tf.getTotal())
             );
         }
     }
