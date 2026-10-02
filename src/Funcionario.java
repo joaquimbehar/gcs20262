@@ -5,7 +5,7 @@ public class Funcionario {
     private final Departamento departamento;
 
     public Funcionario(int matricula, String nome, String iniciais, Departamento departamento) {
-        if (matricula <= 0 || nome == null || nome.trim().isEmpty() || iniciais == null || iniciais.trim().isEmpty() || departamento == null) {
+        if (matricula <= 0 || nome == null || nome.trim().isEmpty() || departamento == null) {
             throw new IllegalArgumentException("Dados do funcionario invalidos.");
         }
         this.matricula = matricula;
