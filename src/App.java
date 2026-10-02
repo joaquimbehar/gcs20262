@@ -135,7 +135,7 @@ public class App {
 
         Departamento departamento =
                 cadastroDepartamentos.buscarPorIndice(
-                        escolhaDepartamento
+                        escolhaDepartamento - 1
                 );
 
         if (departamento == null) {
