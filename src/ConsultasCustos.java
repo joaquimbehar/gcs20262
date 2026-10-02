@@ -1,16 +1,14 @@
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConsultasCustos {
 
-    public List<TotalFuncionario> maioresTotais(List<RegistroCusto> custos) {
+    public List<TotalFuncionario> maioresTotais(List<Custo> custos) {
         List<TotalFuncionario> totais = new ArrayList<>();
 
         for (int i = 0; i < custos.size(); i++) {
-            RegistroCusto custo = custos.get(i);
-            Funcionario funcionario = custo.getResponsavel();
+            Custo custo = custos.get(i);
+            Funcionario funcionario = custo.getFuncionario();
             int posicao = -1;
 
             // Procura se esse funcionario ja tem um total na lista.
@@ -29,6 +27,7 @@ public class ConsultasCustos {
             }
 
             totais.get(posicao).adicionar(custo.getValor());
+            //totais.get(posicao).adicionar(custo.getValor());
         }
 
         // Coloca o maior total na frente, trocando os elementos de lugar.
@@ -36,7 +35,12 @@ public class ConsultasCustos {
             int maior = i;
 
             for (int j = i + 1; j < totais.size(); j++) {
-                int comparacao = totais.get(j).getTotal().compareTo(totais.get(maior).getTotal());
+                int comparacao = -1;
+                if (totais.get(j).getTotal()!=totais.get(maior).getTotal()){
+                    comparacao = 1;
+                } else {
+                    comparacao = 0;
+                }
 
                 if (comparacao > 0) {
                     maior = j;
@@ -62,53 +66,71 @@ public class ConsultasCustos {
         return ranking;
     }
 
-    public List<RegistroCusto> buscarPorValor(List<RegistroCusto> custos,
-            BigDecimal minimo, BigDecimal maximo) {
-        if (minimo == null || maximo == null) {
-            throw new IllegalArgumentException("Informe os dois valores.");
-        }
-        if (minimo.signum() < 0 || maximo.signum() < 0) {
-            throw new IllegalArgumentException("Os valores nao podem ser negativos.");
-        }
-        if (minimo.compareTo(maximo) > 0) {
-            throw new IllegalArgumentException("O minimo nao pode ser maior que o maximo.");
-        }
+    public List<Custo> buscarPorValor(
+        List<Custo> custos,
+        int minimo,
+        int maximo
+) {
 
-        minimo = minimo.setScale(2, RoundingMode.UNNECESSARY);
-        maximo = maximo.setScale(2, RoundingMode.UNNECESSARY);
-        List<RegistroCusto> encontrados = new ArrayList<>();
-
-        for (int i = 0; i < custos.size(); i++) {
-            RegistroCusto custo = custos.get(i);
-            // compareTo retorna negativo, zero ou positivo ao comparar dois valores.
-            if (custo.getValor().compareTo(minimo) > 0
-                    && custo.getValor().compareTo(maximo) <= 0) {
-                encontrados.add(custo);
-            }
-        }
-
-        // Organiza os resultados pela data, do mais recente para o mais antigo.
-        for (int i = 0; i < encontrados.size() - 1; i++) {
-            int maisRecente = i;
-
-            for (int j = i + 1; j < encontrados.size(); j++) {
-                RegistroCusto atual = encontrados.get(j);
-                RegistroCusto escolhido = encontrados.get(maisRecente);
-
-                if (atual.getData().isBefore(escolhido.getData())) {
-                    maisRecente = j;
-                } else if (atual.getData().equals(escolhido.getData())) {
-                    if (atual.getCodigo() > escolhido.getCodigo()) {
-                        maisRecente = j;
-                    }
-                }
-            }
-
-            RegistroCusto auxiliar = encontrados.get(i);
-            encontrados.set(i, encontrados.get(maisRecente));
-            encontrados.set(maisRecente, auxiliar);
-        }
-
-        return encontrados;
+    if (minimo < 0 || maximo < 0) {
+        throw new IllegalArgumentException(
+                "Os valores nao podem ser negativos."
+        );
     }
+
+    if (minimo > maximo) {
+        throw new IllegalArgumentException(
+                "O minimo nao pode ser maior que o maximo."
+        );
+    }
+
+    List<Custo> encontrados = new ArrayList<>();
+
+    for (int i = 0; i < custos.size(); i++) {
+
+        Custo custo = custos.get(i);
+
+        if (custo.getValor() >= minimo && custo.getValor() <= maximo) {
+
+            encontrados.add(custo);
+        }
+    }
+
+    // Organiza do mais recente para o mais antigo.
+    for (int i = 0; i < encontrados.size() - 1; i++) {
+
+        int maisRecente = i;
+
+        for (int j = i + 1; j < encontrados.size(); j++) {
+
+            Custo atual =
+                    encontrados.get(j);
+
+            Custo escolhido =
+                    encontrados.get(maisRecente);
+
+            if (atual.getData().isAfter(
+                    escolhido.getData()
+            )) {
+
+                maisRecente = j;
+            }
+        }
+
+        Custo auxiliar =
+                encontrados.get(i);
+
+        encontrados.set(
+                i,
+                encontrados.get(maisRecente)
+        );
+
+        encontrados.set(
+                maisRecente,
+                auxiliar
+        );
+    }
+
+    return encontrados;
+}
 }

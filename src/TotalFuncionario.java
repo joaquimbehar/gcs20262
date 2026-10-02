@@ -1,31 +1,32 @@
-import java.math.BigDecimal;
-
 public class TotalFuncionario implements Comparable <TotalFuncionario>{
     private final Funcionario funcionario;
-    private BigDecimal total;
+    private double total;
 
     public TotalFuncionario(Funcionario funcionario) {
         this.funcionario = funcionario;
-        this.total = new BigDecimal("0.00");
+        this.total = 0.00;
     }
 
-    public void adicionar(BigDecimal valor) {
-        this.total = this.total.add(valor);
+    public void adicionar(double valor) {
+        this.total += valor;
     }
 
     public Funcionario getFuncionario() {
         return funcionario;
     }
 
-    public BigDecimal getTotal() {
+    public double getTotal() {
         return total;
     }
 
      
     @Override
     public int compareTo(TotalFuncionario outro) {
-        
-        return outro.getTotal().compareTo(this.total);
+        if (outro.getTotal()!=this.total){
+            return 1;
+        }
+
+        return 0;
     }
 
     // Facilita a exibição dos dados no painel do console
