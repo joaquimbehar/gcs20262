@@ -3,100 +3,217 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class PainelGastos {
-    public static class PosicaoRanking {
-        private final Funcionario funcionario;
-        private BigDecimal total = BigDecimal.ZERO;
 
-        public PosicaoRanking(Funcionario funcionario) { this.funcionario = funcionario; }
-        public Funcionario getFuncionario() { return funcionario; }
-        public BigDecimal getTotal() { return total; }
+    private static final int LIMITE_RANKING = 3;
+    private static final Locale LOCALE_BRASIL = Locale.forLanguageTag("pt-BR");
+
+    public static class PosicaoRanking {
+
+        private final Funcionario funcionario;
+        private BigDecimal total;
+
+        public PosicaoRanking(Funcionario funcionario) {
+            this.funcionario = funcionario;
+            this.total = BigDecimal.ZERO;
+        }
+
+        public Funcionario getFuncionario() {
+            return funcionario;
+        }
+
+        public BigDecimal getTotal() {
+            return total;
+        }
+
+        private void adicionarValor(BigDecimal valor) {
+            total = total.add(valor);
+        }
     }
 
     public List<PosicaoRanking> ranking(List<Custo> custos) {
-        Map<String, PosicaoRanking> porMatricula = new LinkedHashMap<>();
+        Map<Integer, PosicaoRanking> rankingPorMatricula = new HashMap<>();
+
         for (Custo custo : custos) {
-            Funcionario autor = custo.getFuncionario();
-            if (autor == null) { continue; }
-            PosicaoRanking posicao = porMatricula.get(autor.getMatricula());
-            if (posicao == null) {
-                posicao = new PosicaoRanking(autor);
-                porMatricula.put(autor.getMatricula(), posicao);
+            Funcionario funcionario = custo.getFuncionario();
+
+            if (funcionario == null) {
+                continue;
             }
-            posicao.total = posicao.total.add(custo.getValor());
+
+            PosicaoRanking posicao = rankingPorMatricula.computeIfAbsent(
+                    funcionario.getMatricula(),
+                    matricula -> new PosicaoRanking(funcionario)
+            );
+
+            posicao.adicionarValor(custo.getValor());
         }
-        List<PosicaoRanking> resultado = new ArrayList<>(porMatricula.values());
-        resultado.sort((a, b) -> {
-            int comparacao = b.total.compareTo(a.total);
-            if (comparacao != 0) { return comparacao; }
-            return a.funcionario.getMatricula().compareTo(b.funcionario.getMatricula());
-        });
-        return new ArrayList<>(resultado.subList(0, Math.min(3, resultado.size())));
+
+        List<PosicaoRanking> ranking = new ArrayList<>(rankingPorMatricula.values());
+
+        ranking.sort(
+                Comparator.comparing(PosicaoRanking::getTotal)
+                        .reversed()
+                        .thenComparingInt(posicao ->
+                                posicao.getFuncionario().getMatricula())
+        );
+
+        int limite = Math.min(LIMITE_RANKING, ranking.size());
+
+        return new ArrayList<>(ranking.subList(0, limite));
     }
 
     public BigDecimal totalDoMes(List<Custo> custos, LocalDate hoje) {
-        BigDecimal total = BigDecimal.ZERO;
         YearMonth mesAtual = YearMonth.from(hoje);
+        BigDecimal total = BigDecimal.ZERO;
+
         for (Custo custo : custos) {
-            if (custo.getData().getMonthValue() == mesAtual.getMonthValue()) {
+            YearMonth mesDoCusto = YearMonth.from(custo.getData());
+
+            if (mesDoCusto.equals(mesAtual)) {
                 total = total.add(custo.getValor());
             }
         }
+
         return total;
     }
 
-    public BigDecimal totalPorDepartamento(List<Custo> custos,
-            Departamento departamento, LocalDate hoje) {
-        LocalDate inicio = hoje.withDayOfMonth(1).minusMonths(3);
-        LocalDate fim = hoje.withDayOfMonth(1).plusMonths(1);
+    public BigDecimal totalPorDepartamento(
+            List<Custo> custos,
+            Departamento departamento,
+            LocalDate hoje
+    ) {
+        YearMonth mesAtual = YearMonth.from(hoje);
+
+        LocalDate inicioPeriodo = mesAtual.minusMonths(2).atDay(1);
+        LocalDate fimPeriodo = mesAtual.plusMonths(1).atDay(1);
+
         BigDecimal total = BigDecimal.ZERO;
+
         for (Custo custo : custos) {
             LocalDate data = custo.getData();
-            boolean dentroDoPeriodo = !data.isBefore(inicio) && data.isBefore(fim);
-            boolean mesmoDepartamento = custo.getDepartamento().getNome()
-                    .equals(departamento.getNome());
+            Departamento departamentoDoCusto = custo.getDepartamento();
+
+            boolean dentroDoPeriodo =
+                    !data.isBefore(inicioPeriodo) && data.isBefore(fimPeriodo);
+
+            boolean mesmoDepartamento =
+                    departamentoDoCusto != null
+                            && departamentoDoCusto.getNome()
+                                    .equals(departamento.getNome());
+
             if (dentroDoPeriodo && mesmoDepartamento) {
                 total = total.add(custo.getValor());
             }
         }
+
         return total;
     }
 
-    public void exibir(Funcionario atual, List<Custo> custos,
-            List<Departamento> departamentos) {
-        exibir(atual, custos, departamentos, LocalDate.now(), System.out);
+    public void exibir(
+            Funcionario funcionarioAtual,
+            List<Custo> custos,
+            List<Departamento> departamentos
+    ) {
+        exibir(
+                funcionarioAtual,
+                custos,
+                departamentos,
+                LocalDate.now(),
+                System.out
+        );
     }
 
-    public void exibir(Funcionario atual, List<Custo> custos,
-            List<Departamento> departamentos, LocalDate hoje, PrintStream saida) {
-        NumberFormat moeda = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"));
+    public void exibir(
+            Funcionario funcionarioAtual,
+            List<Custo> custos,
+            List<Departamento> departamentos,
+            LocalDate hoje,
+            PrintStream saida
+    ) {
+        NumberFormat moeda =
+                NumberFormat.getCurrencyInstance(LOCALE_BRASIL);
+
+        YearMonth mesAtual = YearMonth.from(hoje);
+
         saida.println("=== PAINEL DE GASTOS ===");
-        if (atual == null) {
-            saida.println("Selecione um funcionario para visualizar o painel.");
+
+        if (funcionarioAtual == null) {
+            saida.println(
+                    "Selecione um funcionario para visualizar o painel."
+            );
             return;
         }
-        saida.println("Funcionario: " + atual.getNome() + " (" + atual.getIniciais() + ")");
-        saida.println("Total da empresa no mes " + YearMonth.from(hoje) + ": "
-                + moeda.format(totalDoMes(custos, hoje)));
-        saida.println("Totais por departamento: " + YearMonth.from(hoje).minusMonths(2)
-                + " a " + YearMonth.from(hoje));
+
+        saida.println(
+                "Funcionario: "
+                        + funcionarioAtual.getNome()
+                        + " ("
+                        + funcionarioAtual.getIniciais()
+                        + ")"
+        );
+
+        saida.println(
+                "Total da empresa no mes "
+                        + mesAtual
+                        + ": "
+                        + moeda.format(totalDoMes(custos, hoje))
+        );
+
+        saida.println(
+                "Totais por departamento: "
+                        + mesAtual.minusMonths(2)
+                        + " a "
+                        + mesAtual
+        );
+
         for (Departamento departamento : departamentos) {
-            saida.println(departamento.getNome() + ": "
-                    + moeda.format(totalPorDepartamento(custos, departamento, hoje)));
+            BigDecimal total = totalPorDepartamento(
+                    custos,
+                    departamento,
+                    hoje
+            );
+
+            saida.println(
+                    departamento.getNome()
+                            + ": "
+                            + moeda.format(total)
+            );
         }
-        saida.println("Top 3 funcionarios - todos os custos cadastrados:");
+
+        saida.println(
+                "Top 3 funcionarios - todos os custos cadastrados:"
+        );
+
         List<PosicaoRanking> lideres = ranking(custos);
-        if (lideres.isEmpty()) { saida.println("Nenhum custo com funcionario cadastrado."); }
+
+        if (lideres.isEmpty()) {
+            saida.println(
+                    "Nenhum custo com funcionario cadastrado."
+            );
+            return;
+        }
+
         for (int i = 0; i < lideres.size(); i++) {
             PosicaoRanking posicao = lideres.get(i);
-            saida.println((i + 1) + ". " + posicao.funcionario.getNome()
-                    + " [" + posicao.funcionario.getMatricula() + "]: " + moeda.format(posicao.total));
+            Funcionario funcionario = posicao.getFuncionario();
+
+            saida.println(
+                    (i + 1)
+                            + ". "
+                            + funcionario.getNome()
+                            + " ["
+                            + funcionario.getMatricula()
+                            + "]: "
+                            + moeda.format(posicao.getTotal())
+            );
         }
     }
 }

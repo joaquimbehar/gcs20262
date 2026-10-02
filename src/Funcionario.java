@@ -2,27 +2,17 @@ public class Funcionario {
     private final int matricula;
     private final String nome;
     private final String iniciais;
-    private final String departamento;
+    private final Departamento departamento;
 
-    public Funcionario(int matricula, String nome, String iniciais, String departamento) {
-        if (matricula <= 0 || nome == null || nome.trim().isEmpty()
-                || iniciais == null || iniciais.trim().isEmpty()
-                || departamento == null || departamento.trim().isEmpty()) {
+    public Funcionario(int matricula, String nome, String iniciais, Departamento departamento) {
+        if (matricula <= 0 || nome == null || nome.trim().isEmpty() || departamento == null) {
             throw new IllegalArgumentException("Dados do funcionario invalidos.");
         }
         this.matricula = matricula;
-        this.nome = nome.trim();
-        this.iniciais = iniciais.trim();
-        this.departamento = departamento.trim();
-
-    private int matricula;
-    private String nome;
-    private Departamento departamento;
-
-    public Funcionario(int matricula, String nome, Departamento departamento) {
-        this.matricula = matricula;
         this.nome = nome;
+        this.iniciais = iniciais;
         this.departamento = departamento;
+
     }
 
     public int getMatricula() {
@@ -37,13 +27,10 @@ public class Funcionario {
         return iniciais;
     }
 
-    public String getDepartamento() {
-        return departamento;
-    }
-
     public Departamento getDepartamento() {
         return departamento;
     }
+
 
     @Override
     public String toString() {

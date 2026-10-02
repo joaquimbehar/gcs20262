@@ -23,15 +23,16 @@ public class CadastroFuncionarios {
     public boolean cadastrarFuncionario(
             int matricula,
             String nome,
-            Departamento departamento) {
+            String iniciais,
+            Departamento departamento
+        ) {
 
         if (matriculaExiste(matricula)) {
             System.out.println("Erro: matrícula já cadastrada.");
 
         }
 
-        Funcionario funcionario =
-                new Funcionario(matricula, nome, departamento);
+        Funcionario funcionario = new Funcionario(matricula, nome, iniciais, departamento);
 
         funcionarios.add(funcionario);
 

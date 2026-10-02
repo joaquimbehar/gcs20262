@@ -36,7 +36,9 @@ public class App {
                     System.out.print("Nome: ");
                     String nome = scanner.nextLine();
 
-                    System.out.println();
+                    //Para finalidade de teste deixar como padrão TEMPORARIA as iniciais "LA", depois criar lógica de formatação de string nome para a string iniciais
+                    String iniciais = "LA";
+
                     System.out.println("Departamentos:");
 
                     cadastroDepartamentos.listarDepartamentos();
@@ -60,6 +62,7 @@ public class App {
                         cadastroFuncionarios.cadastrarFuncionario(
                                 matricula,
                                 nome,
+                                iniciais,
                                 departamento
                         );
                     }
