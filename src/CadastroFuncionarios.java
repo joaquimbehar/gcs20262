@@ -56,4 +56,15 @@ public class CadastroFuncionarios {
     public ArrayList<Funcionario> getFuncionarios() {
         return funcionarios;
     }
+
+    public Funcionario buscarPorMatricula(int matricula) {
+
+        for (Funcionario funcionario : funcionarios) {
+            if (funcionario.getMatricula() == matricula) {
+                return funcionario;
+            }
+        }
+
+        return null;
+    }
 }
