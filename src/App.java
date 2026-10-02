@@ -30,6 +30,12 @@ public class App {
 
         List<Custo> custos = new ArrayList<>();
 
+        DadosExemplo.preencher(
+                custos,
+                cadastroDepartamentos,
+                cadastroFuncionarios
+        );
+
         int opcao = -1;
 
         while (opcao != 0) {
@@ -105,10 +111,12 @@ public class App {
         System.out.println("=== CADASTRAR FUNCIONÁRIO ===");
 
         System.out.print("Matrícula: ");
+
         int matricula =
                 Integer.parseInt(scanner.nextLine());
 
         System.out.print("Nome: ");
+
         String nome =
                 scanner.nextLine().trim();
 
@@ -177,6 +185,7 @@ public class App {
         }
 
         System.out.print("Descrição: ");
+
         String descricao =
                 scanner.nextLine().trim();
 
@@ -190,6 +199,7 @@ public class App {
         }
 
         System.out.print("Categoria: ");
+
         String categoria =
                 scanner.nextLine().trim();
 
@@ -400,17 +410,34 @@ public class App {
 
         } else if (opcaoPesquisa == 4) {
 
-            System.out.print("Departamento: ");
+            System.out.print(
+                    "Nome completo do departamento: "
+            );
 
             String departamento =
                     scanner.nextLine().trim();
 
-            filtro = custo ->
-                    custo.getDepartamento() != null
-                            && contemTexto(
-                                    custo.getDepartamento().getNome(),
-                                    departamento
-                            );
+            if (departamento.isEmpty()) {
+
+                System.out.println(
+                        "Informe o nome do departamento."
+                );
+
+                return;
+            }
+
+            List<Custo> resultados =
+                    PesquisaPorDepartamento.buscar(
+                            custos,
+                            departamento
+                    );
+
+            listarCustosFiltrados(
+                    resultados,
+                    custo -> true
+            );
+
+            return;
 
         } else {
 
