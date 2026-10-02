@@ -1,3 +1,5 @@
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,11 +21,35 @@ class Custo {
         this.funcionarioLogado = funcionarioLogado;
     }
 
+    public Custo(double d, LocalDate hoje, Departamento rh, Funcionario atual) {
+        //TODO Auto-generated constructor stub
+    }
+
     @Override
     public String toString() {
         return "Custo: " + descricao + " | Valor: R$" + valor + " | Data: " + data + 
                " | Categoria: " + categoria + " | Depto: " + departamento.getNome() + 
                " | Registado por: " + funcionarioLogado.getNome();
+    }
+
+    public LocalDate getData() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getData'");
+    }
+
+    public Departamento getDepartamento() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getDepartamento'");
+    }
+
+    public BigDecimal getValor() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getValor'");
+    }
+
+    public Funcionario getFuncionario() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getFuncionario'");
     }
 }
 
