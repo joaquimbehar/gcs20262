@@ -1,6 +1,6 @@
 import java.math.BigDecimal;
 
-public class TotalFuncionario {
+public class TotalFuncionario implements Comparable <TotalFuncionario>{
     private final Funcionario funcionario;
     private BigDecimal total;
 
@@ -10,7 +10,7 @@ public class TotalFuncionario {
     }
 
     public void adicionar(BigDecimal valor) {
-        total = valor;
+        this.total = this.total.add(valor);
     }
 
     public Funcionario getFuncionario() {
@@ -19,6 +19,20 @@ public class TotalFuncionario {
 
     public BigDecimal getTotal() {
         return total;
+    }
+
+     
+    @Override
+    public int compareTo(TotalFuncionario outro) {
+        
+        return outro.getTotal().compareTo(this.total);
+    }
+
+    // Facilita a exibição dos dados no painel do console
+    @Override
+    public String toString() {
+       
+        return String.format("%s - R$ %.2f", funcionario.getNome(), total);
     }
 
 }
