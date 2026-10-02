@@ -1,14 +1,14 @@
 import java.util.ArrayList;
 import java.util.List;
 
-// Classe Custo atualizada com o funcionário que a cadastrou
+
 class Custo {
     double valor;
     String descricao;
     String data; 
     String categoria;
     Departamento departamento;
-    Funcionario funcionarioLogado; // Funcionário que registou o custo
+    Funcionario funcionarioLogado;
     
     public Custo(double valor, String descricao, String data, String categoria, Departamento departamento, Funcionario funcionarioLogado) {
         this.valor = valor;
@@ -22,8 +22,8 @@ class Custo {
     @Override
     public String toString() {
         return "Custo: " + descricao + " | Valor: R$" + valor + " | Data: " + data + 
-               " | Categoria: " + categoria + " | Depto: " + departamento.nome + 
-               " | Registado por: " + funcionarioLogado.nome;
+               " | Categoria: " + categoria + " | Depto: " + departamento.getNome() + 
+               " | Registado por: " + funcionarioLogado.getNome();
     }
 }
 
